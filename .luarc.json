@@ -1,0 +1,6 @@
+{
+  "runtime.version": "LuaJIT",
+  "workspace.library": ["../../../love2d-luacats/library"],
+  "diagnostics.globals": ["love"],
+  "format.enable": true
+}
