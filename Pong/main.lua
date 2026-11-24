@@ -1,8 +1,16 @@
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 720
+
 function love.load()
     love.window.setTitle("Pong")
-    love.window.setMode(800, 600)
+
+    love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT, {
+        resizable = false,
+        vsync = true,
+        fullscreen = false
+    })
 end
 
 function love.draw()
-    love.graphics.print("Hola, Lua!", 350, 280)
+    love.graphics.printf("Hola, Lua!", 0, WINDOW_HEIGHT / 2 - 6, WINDOW_WIDTH, "center")
 end
