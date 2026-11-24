@@ -25,6 +25,6 @@ end
 
 function love.draw()
     push:start()
-    love.graphics.printf("Hola, Lua!", 0, VIRTUAL_HEIGHT / 2 - 6, VIRTUAL_WIDTH, "center")
+    love.graphics.printf('Hola, Lua!', 0, VIRTUAL_HEIGHT / 2 - 6, VIRTUAL_WIDTH, 'cente')
     push:finish()
 end
