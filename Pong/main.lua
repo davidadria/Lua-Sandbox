@@ -21,6 +21,8 @@ function love.load()
     -- evitar blur
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
+    love.window.setTitle('Pong')
+
     -- random para el movimiento de la pelota
     math.randomseed(os.time())
 
@@ -115,5 +117,16 @@ function love.draw()
     -- bola
     ball:render()
 
+    -- mostrar FPS
+    displayFPS()
+
     push:finish()
+end
+
+-- mostrar fps por pantalla
+function displayFPS()
+    love.graphics.setFont(smallFont)
+    love.graphics.setColor(0, 255 / 255, 0, 255 / 255)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
+    love.graphics.setColor(1, 1, 1, 1)
 end
