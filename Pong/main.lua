@@ -30,6 +30,12 @@ function love.load()
     largeFont = love.graphics.newFont('font.otf', 32)
     smallFont = love.graphics.newFont('font.otf', 8)
 
+    -- tabla de sonidos
+    sounds = {
+        ['hit'] = love.audio.newSource('bajo.wav', 'static'),
+        ['win'] = love.audio.newSource('win.wav', 'static')
+    }
+
     -- score
     player1Score = 0
     player2Score = 0
@@ -115,6 +121,8 @@ function love.update(dt)
         else
             ball.dy = math.random(10, 150)
         end
+
+        sounds['hit']:play()
     end
 
     -- lo mismo de arriba
@@ -127,35 +135,40 @@ function love.update(dt)
         else
             ball.dy = math.random(10, 150)
         end
+        sounds['hit']:play()
     end
 
     -- detectar colisiones de la bola con los margenes
     if ball.y <= 0 then
         ball.y = 0
         ball.dy = -ball.dy
+        sounds['hit']:play()
     end
 
     if ball.y >= VIRTUAL_HEIGHT - 4 then
         ball.y = VIRTUAL_HEIGHT - 4
         ball.dy = -ball.dy
+        sounds['hit']:play()
     end
 
     -- mientas se este jugando se comprueba la puntuacion
     if gameState == 'play' then
         if ball.x > VIRTUAL_WIDTH then
             player1Score = player1Score + 1
-            if player1Score == 10 then
+            if player1Score == 2 then
                 winningPlayer = 1
                 gameState = 'done'
+                sounds['win']:play()
             else
                 gameState = 'serve'
                 ball:reset()
             end
         elseif ball.x < 0 then
             player2Score = player2Score + 1
-            if player2Score == 10 then
+            if player2Score == 2 then
                 winningPlayer = 2
                 gameState = 'done'
+                sounds['win']:play()
             else
                 gameState = 'serve'
                 ball:reset()
