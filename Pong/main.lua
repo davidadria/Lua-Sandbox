@@ -9,8 +9,13 @@ VIRTUAL_HEIGHT = 243
 -- velocidad de los jugadores
 PADDLE_SPEED = 200
 
--- libreria externa
+-- librerias externas
 push = require 'push'
+Class = require 'class'
+
+-- objetos
+require 'Paddle'
+require 'Ball'
 
 function love.load()
     -- evitar blur
@@ -27,18 +32,10 @@ function love.load()
     player1Score = 0
     player2Score = 0
 
-    -- pos inicial player 1
-    player1Y = VIRTUAL_HEIGHT / 2 - 8
-    -- pos inicial player 2
-    player2Y = VIRTUAL_HEIGHT / 2 - 8
-
-    -- velocidad y pos inicial para la bola
-    ballX = VIRTUAL_WIDTH / 2 - 2
-    ballY = VIRTUAL_HEIGHT / 2 - 2
-
-    -- gestionar la velocidad de la bola
-    ballDX = math.random(2) == 1 and 100 or -100
-    ballDY = math.random(-50, 50)
+    -- objetos de clase
+    player1 = Paddle(10, 30, 5, 20)
+    player2 = Paddle(VIRTUAL_WIDTH - 15, VIRTUAL_HEIGHT - 50, 5, 20)
+    ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 
     -- setup basico de graficos
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -60,38 +57,40 @@ function love.keypressed(key)
         if gameState == 'start' then
             gameState = 'play'
         else
-            -- bola al centro al iniciar
-            ballX = VIRTUAL_WIDTH / 2 - 2
-            ballY = VIRTUAL_HEIGHT / 2 - 2
-
-            ballDX = math.random(2) == 1 and 100 or -100
-            ballDY = math.random(-50, 50) * 1.5
+            -- mover al centro y reiniciar el random de velocidad
+            ball:reset()
         end
     end
 end
 
 -- funcion que se actualiza con la pantalla
 function love.update(dt)
+    -- pos inicial al comenzar
+    player1.dy = 0
+    player2.dy = 0
+
     -- movimiento jugador 1 (w / s)
     -- math.max y math.min hacen las colisiones con los bordes
     if love.keyboard.isDown('w') then
-        player1Y = math.max(0, player1Y + -PADDLE_SPEED * dt)
+        player1.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('s') then
-        player1Y = math.min(VIRTUAL_HEIGHT - 20, player1Y + PADDLE_SPEED * dt)
+        player1.dy = PADDLE_SPEED
     end
 
-    -- movimiento jugador 1 (flecha arriba / flecha abajo)
+    -- movimiento jugador 2 (flecha arriba / flecha abajo)
     if love.keyboard.isDown('up') then
-        player2Y = math.max(0, player2Y + -PADDLE_SPEED * dt)
+        player2.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('down') then
-        player2Y = math.min(VIRTUAL_HEIGHT - 20, player2Y + PADDLE_SPEED * dt)
+        player2.dy = PADDLE_SPEED
     end
 
     -- si se esta ejecutando actualizar la posicion de la bola
     if gameState == 'play' then
-        ballX = ballX + ballDX * dt
-        ballY = ballY + ballDY * dt
+        ball:update(dt)
     end
+
+    player1:update(dt)
+    player2:update(dt)
 end
 
 -- mostrar por pantalla
@@ -108,14 +107,13 @@ function love.draw()
     love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 30, VIRTUAL_HEIGHT / 2 - 92)
 
     -- paddle 1
-    -- posX, posY, Width, Height
-    love.graphics.rectangle('fill', 10, player1Y, 5, 20)
+    player1:render()
 
     -- paddle 2
-    love.graphics.rectangle('fill', VIRTUAL_WIDTH - 15, player2Y, 5, 20)
+    player2:render()
 
-    -- ball
-    love.graphics.rectangle('fill', ballX, ballY, 4, 4)
+    -- bola
+    ball:render()
 
     push:finish()
 end
