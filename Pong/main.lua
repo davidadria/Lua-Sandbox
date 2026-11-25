@@ -34,6 +34,9 @@ function love.load()
     player1Score = 0
     player2Score = 0
 
+    -- al llegar a 10 pts
+    winningPlayer = 0
+
     -- objetos de clase
     player1 = Paddle(10, 30, 5, 20)
     player2 = Paddle(VIRTUAL_WIDTH - 15, VIRTUAL_HEIGHT - 50, 5, 20)
@@ -58,8 +61,15 @@ function love.keypressed(key)
     elseif key == 'enter' or key == 'return' then
         if gameState == 'start' then
             gameState = 'play'
+        elseif gameState == 'serve' then
+            gameState = 'play'
+        elseif gameState == 'done' then
+            -- reinicio completo
+            gameState = 'start'
+            player1Score = 0
+            player2Score = 0
+            ball:reset()
         else
-            -- mover al centro y reiniciar el random de velocidad
             ball:reset()
         end
     end
@@ -130,17 +140,27 @@ function love.update(dt)
         ball.dy = -ball.dy
     end
 
-    -- manejo de puntuacion
-    if ball.x < 0 then
-        player2Score = player2Score + 1
-        ball:reset()
-        gameState = 'start'
-    end
-
-    if ball.x > VIRTUAL_WIDTH then
-        player1Score = player1Score + 1
-        ball:reset()
-        gameState = 'start'
+    -- mientas se este jugando se comprueba la puntuacion
+    if gameState == 'play' then
+        if ball.x > VIRTUAL_WIDTH then
+            player1Score = player1Score + 1
+            if player1Score == 10 then
+                winningPlayer = 1
+                gameState = 'done'
+            else
+                gameState = 'serve'
+                ball:reset()
+            end
+        elseif ball.x < 0 then
+            player2Score = player2Score + 1
+            if player2Score == 10 then
+                winningPlayer = 2
+                gameState = 'done'
+            else
+                gameState = 'serve'
+                ball:reset()
+            end
+        end
     end
 end
 
@@ -168,6 +188,16 @@ function love.draw()
 
     -- mostrar FPS
     displayFPS()
+
+    -- al terminar el loop jugable
+    if gameState == 'done' then
+        love.graphics.setFont(largeFont)
+        love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' Wins!', 0, VIRTUAL_HEIGHT / 2 - 30, VIRTUAL_WIDTH,
+            'center')
+
+        love.graphics.setFont(smallFont)
+        love.graphics.printf('Press Enter to restart', 0, VIRTUAL_HEIGHT / 2 + 10, VIRTUAL_WIDTH, 'center')
+    end
 
     push:finish()
 end
