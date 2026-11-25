@@ -93,6 +93,42 @@ function love.update(dt)
 
     player1:update(dt)
     player2:update(dt)
+
+    if ball:collides(player1) then
+        -- detectar la colision y revertir el eje X y aumentar un poco la velocidad
+        ball.dx = -ball.dx * 1.05
+        -- sacar la bola de la paddel usando su ancho real
+        ball.x = player1.x + player1.width
+
+        if ball.dy < 0 then
+            ball.dy = -math.random(10, 150)
+        else
+            ball.dy = math.random(10, 150)
+        end
+    end
+
+    -- lo mismo de arriba
+    if ball:collides(player2) then
+        ball.dx = -ball.dx * 1.05
+        ball.x = player2.x - ball.width
+
+        if ball.dy < 0 then
+            ball.dy = -math.random(10, 150)
+        else
+            ball.dy = math.random(10, 150)
+        end
+    end
+
+    -- detectar colisiones de la bola con los margenes
+    if ball.y <= 0 then
+        ball.y = 0
+        ball.dy = -ball.dy
+    end
+
+    if ball.y >= VIRTUAL_HEIGHT - 4 then
+        ball.y = VIRTUAL_HEIGHT - 4
+        ball.dy = -ball.dy
+    end
 end
 
 -- mostrar por pantalla
